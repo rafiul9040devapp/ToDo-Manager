@@ -21,6 +21,7 @@ class AddTodoScreen extends StatelessWidget {
     }
 
     return Scaffold(
+      resizeToAvoidBottomInset : false,
       appBar: AppBar(
         title: Text(todo == null ? 'Add Todo' : 'Edit Todo'),
       ),
@@ -32,6 +33,7 @@ class AddTodoScreen extends StatelessWidget {
             children: [
               TextFormField(
                 controller: _titleTEController,
+                textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(hintText: 'Title'),
                 validator: (String? value) {
                   return validationOfInput(value, 'Enter Your Title');
@@ -42,6 +44,7 @@ class AddTodoScreen extends StatelessWidget {
               ),
               TextFormField(
                 controller: _descriptionTEController,
+                textInputAction: TextInputAction.done,
                 maxLines: 5,
                 maxLength: 100,
                 decoration: const InputDecoration(hintText: 'Title'),
