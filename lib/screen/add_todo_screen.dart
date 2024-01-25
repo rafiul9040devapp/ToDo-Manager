@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/model/todo.dart';
 
-class AddTodoScreen extends StatefulWidget {
-  const AddTodoScreen({super.key});
+class AddTodoScreen extends StatelessWidget {
 
-  @override
-  State<AddTodoScreen> createState() => _AddTodoScreenState();
-}
+  final Function(Todo) addNewTodo;
 
-class _AddTodoScreenState extends State<AddTodoScreen> {
+  AddTodoScreen(this.addNewTodo, {super.key});
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   final TextEditingController _titleTEController = TextEditingController();
+
   final TextEditingController _descriptionTEController = TextEditingController();
 
   @override
@@ -61,6 +62,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
                 child: ElevatedButton(
                   onPressed: (){
                     if(_formKey.currentState!.validate()){
+                      addNewTodo( Todo(_titleTEController.text,_descriptionTEController.text,DateTime.now()));
                       Navigator.pop(context);
                     }
                   },
