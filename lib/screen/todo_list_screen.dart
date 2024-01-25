@@ -23,7 +23,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
         },
         backgroundColor: Colors.amberAccent,
         foregroundColor: Colors.white,
-        child: Icon(Icons.add,size: 20,),
+        child: Icon(Icons.add,size: 25,),
       ),
 
       body: ListView.separated(
