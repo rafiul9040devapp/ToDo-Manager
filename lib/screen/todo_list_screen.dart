@@ -4,7 +4,6 @@ import 'package:todo_manager/screen/add_todo_screen.dart';
 
 class TodoListScreen extends StatefulWidget {
   const TodoListScreen({super.key});
-
   @override
   State<TodoListScreen> createState() => _TodoListScreenState();
 }
