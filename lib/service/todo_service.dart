@@ -5,7 +5,7 @@ class ToDoService {
   List<Todo> get listOfTodo => _listOfTodo;
 
 
-  void addItemToList(Todo todo) => _listOfTodo.add(todo);
+  void createItemForList(Todo todo) => _listOfTodo.insert(0, todo);
 
   void updateItemOfList(Todo todo, int index) => _listOfTodo[index] = todo;
 

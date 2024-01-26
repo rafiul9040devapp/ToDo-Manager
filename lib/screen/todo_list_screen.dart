@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo_manager/model/todo.dart';
-import 'package:todo_manager/model/todo_service.dart';
+import 'package:todo_manager/service/todo_service.dart';
 import 'package:todo_manager/screen/add_todo_screen.dart';
 import 'package:todo_manager/utils/date_fomat.dart';
 
@@ -118,7 +118,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
       ),
     );
     if (result != null && result is Todo) {
-      _toDoService.addItemToList(result);
+      _toDoService.createItemForList(result);
       setState(() {});
     }
   }
