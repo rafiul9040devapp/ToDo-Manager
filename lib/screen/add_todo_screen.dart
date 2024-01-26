@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/components/custom_text_form_field.dart';
 import 'package:todo_manager/model/todo.dart';
 
 class AddTodoScreen extends StatelessWidget {
@@ -7,76 +8,73 @@ class AddTodoScreen extends StatelessWidget {
   AddTodoScreen({Key? key, this.todo}) : super(key: key);
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   final TextEditingController _titleTEController = TextEditingController();
-
   final TextEditingController _descriptionTEController =
       TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    if (todo != null) {
-      _titleTEController.text = todo?.title ?? '';
-      _descriptionTEController.text = todo?.description ?? '';
-    }
+    initializeControllers();
 
     return Scaffold(
-      resizeToAvoidBottomInset : false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(todo == null ? 'Add Todo' : 'Edit Todo'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleTEController,
-                textInputAction: TextInputAction.next,
-                decoration: const InputDecoration(hintText: 'Title'),
-                validator: (String? value) {
-                  return validationOfInput(value, 'Enter Your Title');
-                },
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              TextFormField(
-                controller: _descriptionTEController,
-                textInputAction: TextInputAction.done,
-                maxLines: 5,
-                maxLength: 100,
-                decoration: const InputDecoration(hintText: 'Title'),
-                validator: (String? value) {
-                  return validationOfInput(value, 'Enter Your Description');
-                },
-              ),
-              const SizedBox(
-                height: 16,
-              ),
-              SizedBox(
-                width: MediaQuery.sizeOf(context).width,
-                child: ElevatedButton(
-                  onPressed: () {
-                    addingOrUpdatingTheList(context);
-                  },
-                  child: Text(todo == null ? 'Save' : 'Update'),
-                ),
-              )
-            ],
-          ),
+      body: buildForm(context),
+    );
+  }
+
+  Widget buildForm(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            CustomTextFormField(
+              controller: _titleTEController,
+              hintText: 'Title',
+              validator: (value) => validateInput(value, 'Enter Your Title'),
+              textInputAction: TextInputAction.next,
+            ),
+            const SizedBox(height: 16),
+            CustomTextFormField(
+              controller: _descriptionTEController,
+              hintText: 'Description',
+              validator: (value) =>
+                  validateInput(value, 'Enter Your Description'),
+              textInputAction: TextInputAction.done,
+              maxLines: 5,
+              maxLength: 100,
+            ),
+            const SizedBox(height: 16),
+            buildElevatedButton(context),
+          ],
+        ),
+      ),
+    );
+  }
+  Widget buildElevatedButton(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width,
+      child: ElevatedButton(
+        onPressed: () => addingOrUpdatingTheList(context),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(todo == null ? 'Save' : 'Update'),
         ),
       ),
     );
   }
 
-  String? validationOfInput(String? value, String errorMessage) {
-    final v = value ?? '';
-    if (v.trim().isEmpty) {
-      return errorMessage;
-    }
-    return null;
+  void initializeControllers() {
+    _titleTEController.text = todo?.title ?? '';
+    _descriptionTEController.text = todo?.description ?? '';
+  }
+
+  String? validateInput(String? value, String errorMessage) {
+    return value?.trim().isEmpty ?? true ? errorMessage : null;
   }
 
   void addingOrUpdatingTheList(BuildContext context) {

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:todo_manager/model/todo.dart';
 import 'package:todo_manager/model/todo_service.dart';
 import 'package:todo_manager/screen/add_todo_screen.dart';
+import 'package:todo_manager/utils/date_fomat.dart';
 
 class TodoListScreen extends StatefulWidget {
-  const TodoListScreen({super.key});
+  const TodoListScreen({Key? key}) : super(key: key);
 
   @override
   State<TodoListScreen> createState() => _TodoListScreenState();
@@ -28,52 +29,68 @@ class _TodoListScreenState extends State<TodoListScreen> {
           size: 25,
         ),
       ),
-      body: ListView.separated(
-        itemCount: _toDoService.listOfTodo.length,
-        itemBuilder: (context, index) {
-          final item = _toDoService.listOfTodo[index];
-          return ListTile(
-            title: Text(item.title),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.description),
-                Text(item.date.toString()),
-              ],
-            ),
-            trailing: Wrap(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    removeFromList(index);
-                  },
-                  icon: const Icon(
-                    Icons.delete_forever_outlined,
-                    size: 20,
-                    color: Colors.redAccent,
-                  ),
-                ),
-                IconButton(
-                  onPressed: () async {
-                    await updateTheList(context, item, index);
-                  },
-                  icon: const Icon(
-                    Icons.edit,
-                    size: 20,
-                    color: Colors.blueAccent,
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-        separatorBuilder: (context, index) {
-          return Divider(
-            color: Colors.grey.shade200,
-            height: 12,
-            indent: 16,
-          );
-        },
+      body: buildTodoList(),
+    );
+  }
+
+  Widget buildTodoList() {
+    return ListView.separated(
+      itemCount: _toDoService.listOfTodo.length,
+      itemBuilder: (context, index) {
+        final item = _toDoService.listOfTodo[index];
+        return buildTodoItem(item, index);
+      },
+      separatorBuilder: (context, index) {
+        return  Divider(
+          color: Colors.grey.shade300,
+          height: 12,
+          indent: 16,
+        );
+      },
+    );
+  }
+
+  Widget buildTodoItem(Todo item, int index) {
+    return ListTile(
+      title: Text(item.title),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(item.description),
+          Text(formattedDate(item.date)),
+        ],
+      ),
+      trailing: Wrap(
+        children: [
+          buildDeleteButton(index),
+          buildEditButton(item, index),
+        ],
+      ),
+    );
+  }
+
+  Widget buildDeleteButton(int index) {
+    return IconButton(
+      onPressed: () {
+        confirmDeleteDialog(index);
+      },
+      icon: const Icon(
+        Icons.delete_forever_outlined,
+        size: 20,
+        color: Colors.redAccent,
+      ),
+    );
+  }
+
+  Widget buildEditButton(Todo item, int index) {
+    return IconButton(
+      onPressed: () async {
+        await updateTheList(context, item, index);
+      },
+      icon: const Icon(
+        Icons.edit,
+        size: 20,
+        color: Colors.blueAccent,
       ),
     );
   }
@@ -106,7 +123,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
     }
   }
 
-  void removeFromList(int index) {
+  void confirmDeleteDialog(int index) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -119,42 +136,47 @@ class _TodoListScreenState extends State<TodoListScreen> {
           ),
           textAlign: TextAlign.center,
         ),
-        content: const Text('Are you Sure About this?'),
+        content: const Text('Are you Sure About this?',textAlign: TextAlign.center,),
         actions: [
-          TextButton(
-            onPressed: () {
-              _toDoService.removeItemOfList(index);
-              setState(() {});
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Ok',
-              style: TextStyle(
-                color: Colors.greenAccent,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Cancel',
-              style: TextStyle(
-                color: Colors.red,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
+          buildOkButton(index),
+          buildCancelButton(),
         ],
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
+        ),
+      ),
+    );
+  }
+
+  Widget buildOkButton(int index) {
+    return TextButton(
+      onPressed: () {
+        _toDoService.removeItemOfList(index);
+        setState(() {});
+        Navigator.pop(context);
+      },
+      child: const Text(
+        'Ok',
+        style: TextStyle(
+          color: Colors.greenAccent,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget buildCancelButton() {
+    return TextButton(
+      onPressed: () {
+        Navigator.pop(context);
+      },
+      child: const Text(
+        'Cancel',
+        style: TextStyle(
+          color: Colors.red,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

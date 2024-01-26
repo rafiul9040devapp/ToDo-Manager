@@ -21,7 +21,7 @@ class MyTodo extends StatelessWidget {
           ),
           titleTextStyle: TextStyle(
             color: Colors.white,
-            fontSize: 18,
+            fontSize: 25,
             fontWeight: FontWeight.w600,
           ),
         ),
