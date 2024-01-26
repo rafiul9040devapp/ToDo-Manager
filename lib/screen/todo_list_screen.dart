@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo_manager/constants/assets.dart';
 import 'package:todo_manager/model/todo.dart';
 import 'package:todo_manager/service/todo_service.dart';
 import 'package:todo_manager/screen/add_todo_screen.dart';
@@ -21,7 +22,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
         title: const Text('Todo'),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () async => await addToList(context),
+        onPressed: () => _onTapAddNewTodoFAB(context),
         backgroundColor: Colors.amberAccent,
         foregroundColor: Colors.white,
         child: const Icon(
@@ -29,19 +30,28 @@ class _TodoListScreenState extends State<TodoListScreen> {
           size: 25,
         ),
       ),
-      body: buildTodoList(),
+      body: Visibility(
+        visible: _toDoService.listOfTodo.isNotEmpty,
+        replacement: Center(
+          child: Image.asset(
+            AppImages.emptyList,
+            fit: BoxFit.fitWidth,
+          ),
+        ),
+        child: _buildTodoList(),
+      ),
     );
   }
 
-  Widget buildTodoList() {
+  Widget _buildTodoList() {
     return ListView.separated(
       itemCount: _toDoService.listOfTodo.length,
       itemBuilder: (context, index) {
-        final item = _toDoService.listOfTodo[index];
-        return buildTodoItem(item, index);
+        final todo = _toDoService.listOfTodo[index];
+        return _buildTodoItem(todo, index);
       },
       separatorBuilder: (context, index) {
-        return  Divider(
+        return Divider(
           color: Colors.grey.shade300,
           height: 12,
           indent: 16,
@@ -50,7 +60,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
     );
   }
 
-  Widget buildTodoItem(Todo item, int index) {
+  ListTile _buildTodoItem(Todo item, int index) {
     return ListTile(
       title: Text(item.title),
       subtitle: Column(
@@ -84,9 +94,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
 
   Widget buildEditButton(Todo item, int index) {
     return IconButton(
-      onPressed: () async {
-        await updateTheList(context, item, index);
-      },
+      onPressed: () => _onTapEditTodo(context, item, index),
       icon: const Icon(
         Icons.edit,
         size: 20,
@@ -95,7 +103,21 @@ class _TodoListScreenState extends State<TodoListScreen> {
     );
   }
 
-  Future<void> updateTheList(BuildContext context, Todo item, int index) async {
+  Future<void> _onTapAddNewTodoFAB(BuildContext context) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AddTodoScreen(),
+      ),
+    );
+    if (result != null && result is Todo) {
+      _toDoService.createItemForList(result);
+      setState(() {});
+    }
+  }
+
+  Future<void> _onTapEditTodo(
+      BuildContext context, Todo item, int index) async {
     final result = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -110,17 +132,9 @@ class _TodoListScreenState extends State<TodoListScreen> {
     }
   }
 
-  Future<void> addToList(BuildContext context) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AddTodoScreen(),
-      ),
-    );
-    if (result != null && result is Todo) {
-      _toDoService.createItemForList(result);
-      setState(() {});
-    }
+  void _removeTodo(int index) {
+    _toDoService.removeItemOfList(index);
+    setState(() {});
   }
 
   void confirmDeleteDialog(int index) {
@@ -136,7 +150,10 @@ class _TodoListScreenState extends State<TodoListScreen> {
           ),
           textAlign: TextAlign.center,
         ),
-        content: const Text('Are you Sure About this?',textAlign: TextAlign.center,),
+        content: const Text(
+          'Are you Sure About this?',
+          textAlign: TextAlign.center,
+        ),
         actions: [
           buildOkButton(index),
           buildCancelButton(),
@@ -151,8 +168,7 @@ class _TodoListScreenState extends State<TodoListScreen> {
   Widget buildOkButton(int index) {
     return TextButton(
       onPressed: () {
-        _toDoService.removeItemOfList(index);
-        setState(() {});
+        _removeTodo(index);
         Navigator.pop(context);
       },
       child: const Text(

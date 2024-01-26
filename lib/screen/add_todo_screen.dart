@@ -10,13 +10,11 @@ class AddTodoScreen extends StatelessWidget {
 
   final TextEditingController _titleTEController = TextEditingController();
 
-  final TextEditingController _descriptionTEController =
-  TextEditingController();
+  final TextEditingController _descriptionTEController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     initializeControllers();
-
     return Scaffold(
       resizeToAvoidBottomInset : false,
       appBar: AppBar(
@@ -84,8 +82,8 @@ class AddTodoScreen extends StatelessWidget {
       Navigator.pop(
         context,
         Todo(
-          _titleTEController.text,
-          _descriptionTEController.text,
+          _titleTEController.text.trim(),
+          _descriptionTEController.text.trim(),
           DateTime.now(),
         ),
       );
